@@ -19,6 +19,10 @@ export {
   BundleAnalyzer,
   AssetAnalyzer,
   ViteAnalyzer,
+  SecurityAnalyzer,
+  FrameworkAnalyzer,
+  CacheAnalyzer,
+  NetworkAnalyzer,
 } from './analyzers'
 
 export type {
@@ -47,6 +51,7 @@ export {
   JsonReporter,
   HtmlReporter,
   MarkdownReporter,
+  GitHubActionsReporter,
 } from './reporters'
 
 // 导出插件
@@ -55,4 +60,14 @@ export { performancePlugin } from './plugins'
 // 导出工具函数
 export * from './utils'
 
+// 导出运行时监控
+export { RuntimeMonitor } from './monitor'
 
+// 导出历史管理
+export { HistoryManager, TrendAnalyzer } from './history'
+
+// 导出导出器
+export { PrometheusExporter } from './exporters'
+
+// 导出仪表板
+export { DashboardServer } from './dashboard'

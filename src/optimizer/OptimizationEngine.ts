@@ -9,6 +9,10 @@ import {
   CodeSplittingRule,
   TreeShakingRule,
   LazyLoadingRule,
+  CssOptimizationRule,
+  FontOptimizationRule,
+  ThirdPartyScriptRule,
+  CompressionRule,
 } from './rules'
 
 export class OptimizationEngine {
@@ -21,6 +25,10 @@ export class OptimizationEngine {
       new CodeSplittingRule(),
       new TreeShakingRule(),
       new LazyLoadingRule(),
+      new CssOptimizationRule(),
+      new FontOptimizationRule(),
+      new ThirdPartyScriptRule(),
+      new CompressionRule(),
     ]
   }
 

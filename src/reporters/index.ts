@@ -5,5 +5,5 @@ export { CliReporter } from './CliReporter'
 export { JsonReporter } from './JsonReporter'
 export { HtmlReporter } from './HtmlReporter'
 export { MarkdownReporter } from './MarkdownReporter'
-
+export { GitHubActionsReporter } from './GitHubActionsReporter'
 

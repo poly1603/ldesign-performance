@@ -1,8 +1,26 @@
 # @ldesign/performance
 
-> 🚀 全方位的性能优化工具，让你的应用飞起来
+> 🚀 性能与代码分析工具 - 整合了 @ldesign/analyzer 的所有功能
+
+**v1.0.0 重大更新**: 本包已整合 `@ldesign/analyzer` 的所有功能，提供统一的性能优化和代码分析解决方案。
+
+## ⚠️ 迁移说明
+
+如果你之前使用 `@ldesign/analyzer`，请迁移到 `@ldesign/performance`：
+
+```bash
+# 卸载旧包
+pnpm remove @ldesign/analyzer
+
+# 安装新包
+pnpm add -D @ldesign/performance
+```
+
+所有 `@ldesign/analyzer` 的功能现在都可以通过 `@ldesign/performance/analyzer` 访问。CLI 命令 `ldesign-analyzer` 仍然可用。
 
 ## ✨ 特性
+
+### 性能优化功能
 
 - 📊 **构建分析** - 深度分析打包产物，识别性能瓶颈
 - 📈 **性能指标** - 完整的构建时间和体积追踪
@@ -11,6 +29,15 @@
 - 🤖 **CI/CD 集成** - 性能预算控制，自动化性能检查
 - 🔍 **Vite 插件** - 无缝集成到 Vite 构建流程
 - ⚡ **优化规则库** - 内置多种优化规则，可扩展
+
+### 代码分析功能（来自 @ldesign/analyzer v1.0+）
+
+- 🔬 **代码质量分析** - 代码复杂度、代码异味、死代码检测
+- 🕸️ **依赖分析** - 循环依赖检测、依赖关系图、重复依赖检测
+- 📦 **打包体积分析** - 模块大小、Asset分析、TreeMap可视化
+- 🔐 **安全扫描** - 敏感信息检测、许可证检查、漏洞扫描
+- 📊 **可视化** - 依赖图、Sunburst图、TreeMap图、趋势分析
+- 🏗️ **多解析器** - 支持 Webpack、Rollup、Vite 构建产物解析
 
 ## 📦 安装
 
@@ -132,11 +159,20 @@ export default {
 
 内置以下优化规则：
 
+**核心规则**
 - **Bundle Size Rule** - 打包体积优化建议
-- **Image Optimization Rule** - 图片压缩和格式优化
 - **Code Splitting Rule** - 代码分割策略建议
 - **Tree Shaking Rule** - Tree-shaking 优化
 - **Lazy Loading Rule** - 懒加载实施建议
+
+**资源优化**
+- **Image Optimization Rule** - 图片压缩和格式优化
+- **CSS Optimization Rule** - CSS 体积、关键 CSS、未使用样式检测
+- **Font Optimization Rule** - 字体子集化、WOFF2 格式、font-display 策略
+
+**性能优化**
+- **Compression Rule** - Gzip/Brotli 压缩优化
+- **Third Party Script Rule** - 第三方脚本延迟加载、Facade 模式
 
 ### 自定义规则
 
@@ -187,6 +223,8 @@ Options:
 ```
 
 ### monitor
+运行时性能监控，支持 Lighthouse 和 Web Vitals 收集：
+
 ```bash
 ldesign-performance monitor [options]
 
@@ -210,13 +248,14 @@ Options:
 
 ### CI/CD 集成
 
-在 GitHub Actions 中使用：
+#### GitHub Actions
 
 ```yaml
 - name: Build
   run: npm run build
 
 - name: Performance Analysis
+  id: perf
   run: npx ldesign-performance analyze --format json
 
 - name: Check Budget
@@ -225,6 +264,55 @@ Options:
       echo "Performance budget exceeded!"
       exit 1
     fi
+
+- name: Comment PR
+  uses: actions/github-script@v6
+  if: github.event_name == 'pull_request'
+  with:
+    script: |
+      const fs = require('fs')
+      const report = JSON.parse(fs.readFileSync('.performance/report.json', 'utf8'))
+      // 使用 GitHubActionsReporter 生成评论
+```
+
+#### 历史趋势分析
+
+```typescript
+import { HistoryManager, TrendAnalyzer } from '@ldesign/performance'
+
+// 保存历史记录
+const history = new HistoryManager('.performance')
+await history.addEntry(report, {
+  commit: process.env.GIT_COMMIT,
+  branch: process.env.GIT_BRANCH,
+})
+
+// 分析趋势
+const analyzer = new TrendAnalyzer()
+const trends = analyzer.analyzeTrends(await history.getHistory(30))
+
+// 检测回归
+if (trends.regressions.length > 0) {
+  console.error('⚠️ Performance regressions detected!')
+  for (const regression of trends.regressions) {
+    console.log(`- ${regression.metric}: ${regression.changePercentage}%`)
+  }
+}
+```
+
+#### Prometheus Metrics 导出
+
+```typescript
+import { PrometheusExporter } from '@ldesign/performance'
+
+const exporter = new PrometheusExporter('my_app')
+const metrics = exporter.generateMetrics(report)
+const text = exporter.formatPrometheusText(metrics)
+
+// 导出到文件
+exporter.exportToFile(report, './metrics.prom')
+
+// 或通过 HTTP 推送到 Pushgateway
 ```
 
 ### 开发流程
